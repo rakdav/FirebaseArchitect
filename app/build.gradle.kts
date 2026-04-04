@@ -9,7 +9,7 @@ plugins {
 
 android {
     namespace = "ro.alexmamo.firestorecleanarchitecture"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "ro.alexmamo.firestorecleanarchitecture"

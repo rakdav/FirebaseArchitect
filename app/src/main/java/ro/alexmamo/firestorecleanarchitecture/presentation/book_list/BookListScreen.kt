@@ -54,6 +54,8 @@ fun BookListScreen(
 
                    }
                }
+
+                else -> {}
             }
         }
 }
