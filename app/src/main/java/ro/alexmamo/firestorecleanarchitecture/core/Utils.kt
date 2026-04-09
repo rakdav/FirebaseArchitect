@@ -10,7 +10,8 @@ const val ID_FIELD = "id"
 const val TITLE_FIELD = "title"
 const val NO_BOOK_AUTHOR = "No book author"
 const val NO_BOOK_TITLE = "No book title"
-
+const val EMPTY_STRING=""
+const val NON_EXISTENT_BOOK_ID="NO_ID"
 fun logErrorMessage(
     errorMessage: String
 ) = Log.e(TAG, errorMessage)

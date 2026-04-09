@@ -11,6 +11,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import ro.alexmamo.firestorecleanarchitecture.core.AUTHOR_FIELD
+import ro.alexmamo.firestorecleanarchitecture.core.ID_FIELD
+import ro.alexmamo.firestorecleanarchitecture.core.TITLE_FIELD
 import ro.alexmamo.firestorecleanarchitecture.domain.model.Book
 import ro.alexmamo.firestorecleanarchitecture.presentation.book_list.BookField
 
@@ -33,11 +36,40 @@ fun BookListContent(
         {
             book->
             if(editBookId!=book.id){
-
+                BookCard(
+                    book=book,
+                    onEditBook = {
+                        editBookId=book.id
+                    },
+                    onDeleteBook={
+                        onDeleteBook(book.id)
+                        editBookId=NON_EXISTENT_BOOK_ID
+                    }
+                )
             }
             else
             {
-
+                EditableBookCard(
+                    book=book,
+                    onUpdateBook={
+                        title,author->
+                        val  bookUpdates=mutableMapOf<String, String>()
+                        if(book.title!=title){
+                            bookUpdates[TITLE_FIELD]=title
+                        }
+                        if (book.author != author) {
+                            bookUpdates[AUTHOR_FIELD] = author
+                        }
+                        if (bookUpdates.isNotEmpty()) {
+                            bookUpdates[ID_FIELD] = book.id
+                            onUpdateBook(bookUpdates)
+                        }
+                        editBookId = NON_EXISTENT_BOOK_ID
+                    },
+                    onInvalidBookField=onInvalidBookField,
+                    onCancel = {
+                        editBookId=NON_EXISTENT_BOOK_ID
+                    })
             }
         }
     }

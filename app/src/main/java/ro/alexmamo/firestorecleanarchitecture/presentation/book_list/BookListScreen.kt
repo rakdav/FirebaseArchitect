@@ -13,15 +13,19 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import ro.alexmamo.firestorecleanarchitecture.R
 import ro.alexmamo.firestorecleanarchitecture.components.LoadingIndicator
+import ro.alexmamo.firestorecleanarchitecture.core.logErrorMessage
+import ro.alexmamo.firestorecleanarchitecture.core.showToastMessage
 import ro.alexmamo.firestorecleanarchitecture.domain.model.Response
 import ro.alexmamo.firestorecleanarchitecture.presentation.book_list.components.AddBookFloatingActionButton
+import ro.alexmamo.firestorecleanarchitecture.presentation.book_list.components.BookListContent
 import ro.alexmamo.firestorecleanarchitecture.presentation.book_list.components.EmptyBookListContent
 import ro.alexmamo.firestorecleanarchitecture.presentation.book_list.components.TopBar
 
 @Composable
 fun BookListScreen(
     viewModel: BookListViewModel = viewModel()
-) {
+)
+{
     val context = LocalContext.current
     var openAddBookDialog by remember { mutableStateOf(false) }
     val bookListResponse by viewModel.bookListState.collectAsStateWithLifecycle()
@@ -41,23 +45,35 @@ fun BookListScreen(
             )
         })
         { innerPadding->
-            when(val bookListResponse=bookListResponse){
-               is Response.Idle->{}
-               is Response.Loading-> LoadingIndicator()
-               is Response.Success->bookListResponse.data?.let {
-                    bookList ->
-                   if(bookList.isEmpty()){
-                       EmptyBookListContent(innerPadding=innerPadding)
-                   }
-                   else
-                   {
-
-                   }
-               }
-
-                else -> {}
+            when(val bookListResponse = bookListResponse) {
+                is Response.Idle -> {}
+                is Response.Loading -> LoadingIndicator()
+                is Response.Success -> bookListResponse.data?.let { bookList ->
+                    if (bookList.isEmpty()) {
+                        EmptyBookListContent(
+                            innerPadding = innerPadding
+                        )
+                    } else {
+                        BookListContent(
+                            innerPadding = innerPadding,
+                            bookList = bookList,
+                            onUpdateBook = viewModel::updateBook,
+                            onInvalidBookField = { bookField ->
+                                showToastMessage(context, "$bookField $invalidBookFieldMessage")
+                            },
+                            onDeleteBook = viewModel::deleteBook
+                        )
+                    }
+                }
+                is Response.Failure -> bookListResponse.e?.message?.let { errorMessage ->
+                    LaunchedEffect(errorMessage) {
+                        logErrorMessage(errorMessage)
+                        showToastMessage(context, errorMessage)
+                    }
+                }
             }
         }
+
 }
 
 enum class BookAction(){
