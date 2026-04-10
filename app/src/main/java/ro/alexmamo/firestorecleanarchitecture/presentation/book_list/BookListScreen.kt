@@ -73,7 +73,6 @@ fun BookListScreen(
                 }
             }
         }
-
 }
 
 enum class BookAction(){

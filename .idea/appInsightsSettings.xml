@@ -8,10 +8,10 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="ro.alexmamo.firestorecleanarchitecture" />
-                  <option name="mobileSdkAppId" value="1:583233152843:android:e3ebd236f87084e9a7eace" />
-                  <option name="projectId" value="firestorearchitecture" />
-                  <option name="projectNumber" value="583233152843" />
+                  <option name="appId" value="PLACEHOLDER" />
+                  <option name="mobileSdkAppId" value="" />
+                  <option name="projectId" value="" />
+                  <option name="projectNumber" value="" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />

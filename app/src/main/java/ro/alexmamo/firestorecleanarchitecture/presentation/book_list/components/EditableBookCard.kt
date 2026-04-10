@@ -37,7 +37,7 @@ fun EditableBookCard(
         text = bookTitle,
         selection = TextRange(bookTitle.length)
     )) }
-    val authorTitle=book.title?: EMPTY_STRING
+    val authorTitle=book.author?: EMPTY_STRING
     var author by remember { mutableStateOf(TextFieldValue(
         text = authorTitle,
         selection = TextRange(authorTitle.length)
@@ -55,7 +55,10 @@ fun EditableBookCard(
         {
             TitleTextField(
                 title = title,
-                onTitleChange = { newAuthor -> author = newAuthor })
+                onTitleChange = { newTitle ->
+                    title = newTitle
+                }
+            )
             Spacer(modifier = Modifier.height(8.dp))
             AuthorTextField(
                 author = author,
@@ -76,6 +79,9 @@ fun EditableBookCard(
                         }
                         else if(!isAuthorValid){
                             onInvalidBookField(BookField.AUTHOR)
+                        }
+                        else {
+                            onUpdateBook(title.text, author.text)
                         }
                     },
                     resourceId = R.string.update_button
