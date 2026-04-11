@@ -16,6 +16,8 @@ import ro.alexmamo.firestorecleanarchitecture.components.LoadingIndicator
 import ro.alexmamo.firestorecleanarchitecture.core.logErrorMessage
 import ro.alexmamo.firestorecleanarchitecture.core.showToastMessage
 import ro.alexmamo.firestorecleanarchitecture.domain.model.Response
+import ro.alexmamo.firestorecleanarchitecture.domain.repository.AddBookResponse
+import ro.alexmamo.firestorecleanarchitecture.presentation.book_list.components.AddBookAlertDialog
 import ro.alexmamo.firestorecleanarchitecture.presentation.book_list.components.AddBookFloatingActionButton
 import ro.alexmamo.firestorecleanarchitecture.presentation.book_list.components.BookListContent
 import ro.alexmamo.firestorecleanarchitecture.presentation.book_list.components.EmptyBookListContent
@@ -44,37 +46,94 @@ fun BookListScreen(
                 }
             )
         })
-        { innerPadding->
-            when(val bookListResponse = bookListResponse) {
+    { innerPadding ->
+        when (val bookListResponse = bookListResponse) {
+            is Response.Idle -> {}
+            is Response.Loading -> LoadingIndicator()
+            is Response.Success -> bookListResponse.data?.let { bookList ->
+                if (bookList.isEmpty()) {
+                    EmptyBookListContent(
+                        innerPadding = innerPadding
+                    )
+                } else {
+                    BookListContent(
+                        innerPadding = innerPadding,
+                        bookList = bookList,
+                        onUpdateBook = viewModel::updateBook,
+                        onInvalidBookField = { bookField ->
+                            showToastMessage(context, "$bookField $invalidBookFieldMessage")
+                        },
+                        onDeleteBook = viewModel::deleteBook
+                    )
+                }
+            }
+
+            is Response.Failure -> bookListResponse.e?.message?.let { errorMessage ->
+                LaunchedEffect(errorMessage) {
+                    logErrorMessage(errorMessage)
+                    showToastMessage(context, errorMessage)
+                }
+            }
+        }
+        if (openAddBookDialog) {
+            AddBookAlertDialog(
+                onAddBook = viewModel::addBook,
+                onInvalidBookField = { bookField ->
+                    showToastMessage(
+                        context,
+                        "$bookField $invalidBookFieldMessage"
+                    )
+                },
+                onAddBookDialogCancel = { openAddBookDialog = false }
+            )
+        }
+
+        when(val addBookResponse = addBookResponse) {
                 is Response.Idle -> {}
                 is Response.Loading -> LoadingIndicator()
-                is Response.Success -> bookListResponse.data?.let { bookList ->
-                    if (bookList.isEmpty()) {
-                        EmptyBookListContent(
-                            innerPadding = innerPadding
-                        )
-                    } else {
-                        BookListContent(
-                            innerPadding = innerPadding,
-                            bookList = bookList,
-                            onUpdateBook = viewModel::updateBook,
-                            onInvalidBookField = { bookField ->
-                                showToastMessage(context, "$bookField $invalidBookFieldMessage")
-                            },
-                            onDeleteBook = viewModel::deleteBook
-                        )
-                    }
+                is Response.Success->LaunchedEffect(Unit) {
+                    showToastMessage(context,"${BookAction.ADD} $bookActionMessage")
+                    viewModel.resetAddBookState()
                 }
-                is Response.Failure -> bookListResponse.e?.message?.let { errorMessage ->
+                is Response.Failure -> addBookResponse.e?.message?.let { errorMessage ->
                     LaunchedEffect(errorMessage) {
                         logErrorMessage(errorMessage)
                         showToastMessage(context, errorMessage)
+                        viewModel.resetAddBookState()
                     }
                 }
             }
-        if(openAddBookDialog){
-
+        when(val updateBookResponse = updateBookResponse) {
+            is Response.Idle -> {}
+            is Response.Loading -> LoadingIndicator()
+            is Response.Success->LaunchedEffect(Unit) {
+                showToastMessage(context,"${BookAction.ADD} $bookActionMessage")
+                viewModel.resetAddBookState()
+            }
+            is Response.Failure -> updateBookResponse.e?.message?.let { errorMessage ->
+                LaunchedEffect(errorMessage) {
+                    logErrorMessage(errorMessage)
+                    showToastMessage(context, errorMessage)
+                    viewModel.resetUpdateBookState()
+                }
+            }
         }
+        when(val deleteBookResponse = deleteBookResponse) {
+            is Response.Idle -> {}
+            is Response.Loading -> LoadingIndicator()
+            is Response.Success->LaunchedEffect(Unit) {
+                showToastMessage(context,"${BookAction.ADD} $bookActionMessage")
+                viewModel.resetAddBookState()
+            }
+            is Response.Failure -> deleteBookResponse.e?.message?.let { errorMessage ->
+                LaunchedEffect(errorMessage) {
+                    logErrorMessage(errorMessage)
+                    showToastMessage(context, errorMessage)
+                    viewModel.resetAddBookState()
+                }
+            }
+        }
+
     }
 
 }
