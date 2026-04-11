@@ -72,7 +72,11 @@ fun BookListScreen(
                     }
                 }
             }
+        if(openAddBookDialog){
+
         }
+    }
+
 }
 
 enum class BookAction(){
